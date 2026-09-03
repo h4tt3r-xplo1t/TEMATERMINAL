@@ -26,35 +26,33 @@ Tema de terminal estilo **cyberpunk** con colores morados, neones y efectos futu
 
 ## 📦 Instalación Rápida
 
-### Opción 1: Script Automático (Recomendado)
+### Opción 1: Script Automático Fedora + Ptyxis 5.0 (Recomendado)
 
 ```bash
-chmod +x install-purple-theme.sh
-./install-purple-theme.sh
+chmod +x install-fedora.sh
+./install-fedora.sh
 ```
 
 El script hará todo automáticamente:
-- ✅ Crear directorios necesarios
-- ✅ Generar archivos de configuración
-- ✅ Aplicar el tema
+- ✅ Detectar instalación y versión de Ptyxis
+- ✅ Aplicar el tema al perfil activo (UUID dinámico)
+- ✅ Verificar claves críticas y mostrar diagnóstico
 
 ### Opción 2: Instalación Manual
 
-#### Paso 1: Crear directorios
+#### Paso 1: Aplicar directamente al perfil activo
 ```bash
-mkdir -p ~/.config/ptyxis/schemes
+bash ./install-ptyxis50.sh
 ```
 
-#### Paso 2: Copiar archivos de tema
+#### Paso 2: Verificar resultado
 ```bash
-cp purple-cyberpunk.xml ~/.config/ptyxis/schemes/
-cp purple-cyberpunk.dconf ~/.config/ptyxis/schemes/
+bash ./verify-ptyxis50.sh
 ```
 
 #### Paso 3: Recargar Ptyxis
 ```bash
-killall ptyxis
-ptyxis &
+bash ~/.config/ptyxis/restart-with-theme.sh
 ```
 
 ---
@@ -68,13 +66,12 @@ ptyxis &
 4. Busca y haz clic en **"Purple Cyberpunk"**
 5. El cambio se aplica inmediatamente
 
-### Método 2: Línea de Comandos (DConf)
+### Método 2: Línea de Comandos (perfil UUID real)
 ```bash
-# Aplicar la configuración DConf
-dconf load /org/gnome/Ptyxis/Profiles/purple-cyberpunk < ~/.config/ptyxis/dconf-purple-settings
-
-# O establecer como tema por defecto
-gsettings set org.gnome.Ptyxis color-scheme 'purple-cyberpunk'
+# Leer UUID activo
+UUID=$(dconf read /org/gnome/Ptyxis/default-profile-uuid | tr -d "'")
+# Ver color aplicado
+dconf read /org/gnome/Ptyxis/Profiles/${UUID}/background-color
 ```
 
 ### Método 3: Edición Manual
@@ -82,14 +79,15 @@ gsettings set org.gnome.Ptyxis color-scheme 'purple-cyberpunk'
 # Editar configuración manualmente
 dconf-editor
 
-# Navegate to: /org/gnome/Ptyxis/Profiles/purple-cyberpunk
+# Navega a: /org/gnome/Ptyxis/Profiles/<UUID_ACTIVO>
+# UUID_ACTIVO=$(dconf read /org/gnome/Ptyxis/default-profile-uuid | tr -d "'")
 ```
 
 ---
 
 ## 🛠️ Solución de Problemas
 
-### El tema no aparece en la lista
+### El tema no aparece o no se aplica
 
 **Solución 1:** Reinicia Ptyxis completamente
 ```bash
@@ -104,9 +102,9 @@ ls -la ~/.config/ptyxis/schemes/
 # Deberías ver: purple-cyberpunk.xml y purple-cyberpunk.dconf
 ```
 
-**Solución 3:** Recarga la base de datos de DConf
+**Solución 3:** Ejecuta diagnóstico completo
 ```bash
-dconf update
+bash ./verify-ptyxis50.sh
 ```
 
 ### Los colores no se ven correctamente
@@ -160,7 +158,7 @@ TEMATERMINAL/
 
 | Componente | Versión | Estado |
 |-----------|---------|--------|
-| **Ptyxis** | 45.0+ | ✅ Completa |
+| **Ptyxis** | 5.0+ | ✅ Completa |
 | **GNOME** | 45+ | ✅ Completa |
 | **Linux** | Cualquiera | ✅ Completa |
 | **macOS** | N/A | ❌ No soportado |
@@ -173,19 +171,22 @@ TEMATERMINAL/
 ### Cambiar solo el color de fondo
 
 ```bash
-gsettings set org.gnome.Ptyxis.Profiles:purple-cyberpunk background-color 'rgb(10, 0, 20)'
+UUID=$(dconf read /org/gnome/Ptyxis/default-profile-uuid | tr -d "'")
+dconf write /org/gnome/Ptyxis/Profiles/${UUID}/background-color "'rgb(10, 0, 20)'"
 ```
 
 ### Cambiar solo el color del texto
 
 ```bash
-gsettings set org.gnome.Ptyxis.Profiles:purple-cyberpunk foreground-color 'rgb(224, 176, 255)'
+UUID=$(dconf read /org/gnome/Ptyxis/default-profile-uuid | tr -d "'")
+dconf write /org/gnome/Ptyxis/Profiles/${UUID}/foreground-color "'rgb(224, 176, 255)'"
 ```
 
 ### Cambiar el cursor
 
 ```bash
-gsettings set org.gnome.Ptyxis.Profiles:purple-cyberpunk cursor-background-color 'rgb(255, 0, 255)'
+UUID=$(dconf read /org/gnome/Ptyxis/default-profile-uuid | tr -d "'")
+dconf write /org/gnome/Ptyxis/Profiles/${UUID}/cursor-background-color "'rgb(255, 0, 255)'"
 ```
 
 ### Cambiar la fuente
@@ -284,4 +285,4 @@ Si encuentras un problema:
 ---
 
 **Última actualización:** 2026-09-03  
-**Versión:** 1.0
+**Versión:** 1.1

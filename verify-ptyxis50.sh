@@ -1,60 +1,127 @@
 #!/bin/bash
 
-# Script de verificación para Ptyxis 50.x
+# Script de verificación para Ptyxis 5.0+
 # Verifica si los colores se aplicaron correctamente
 
-echo "🔍 VERIFICANDO CONFIGURACIÓN DE PTYXIS 50.x"
+set -euo pipefail
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+PASS_COUNT=0
+FAIL_COUNT=0
+
+pass() {
+    echo -e "${GREEN}✅ $1${NC}"
+    PASS_COUNT=$((PASS_COUNT + 1))
+}
+
+warn() {
+    echo -e "${YELLOW}⚠️  $1${NC}"
+}
+
+fail() {
+    echo -e "${RED}❌ $1${NC}"
+    FAIL_COUNT=$((FAIL_COUNT + 1))
+}
+
+echo -e "${BLUE}🔍 VERIFICANDO CONFIGURACIÓN DE PTYXIS 5.0+${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
-# Obtener el UUID del perfil default
-DEFAULT_PROFILE_UUID=$(dconf read /org/gnome/Ptyxis/default-profile-uuid 2>/dev/null | tr -d "'")
+if ! command -v ptyxis >/dev/null 2>&1; then
+    fail "Ptyxis no está instalado (comando 'ptyxis' no encontrado)"
+fi
 
-echo "UUID del perfil: $DEFAULT_PROFILE_UUID"
-echo ""
+if ! command -v dconf >/dev/null 2>&1; then
+    fail "dconf no está disponible"
+fi
 
-if [ -z "$DEFAULT_PROFILE_UUID" ]; then
-    echo "❌ No hay perfil configurado"
+if ! command -v gsettings >/dev/null 2>&1; then
+    fail "gsettings no está disponible"
+fi
+
+if [ "${FAIL_COUNT}" -gt 0 ]; then
+    echo ""
+    echo "Resultado: ${FAIL_COUNT} fallo(s) crítico(s)"
     exit 1
 fi
 
-# Verificar cada propiedad
-PROFILE_PATH="/org/gnome/Ptyxis/Profiles/${DEFAULT_PROFILE_UUID}"
+PTYXIS_VERSION_RAW="$(ptyxis --version 2>/dev/null || true)"
+if [ -z "${PTYXIS_VERSION_RAW}" ] && command -v rpm >/dev/null 2>&1; then
+    PTYXIS_VERSION_RAW="$(rpm -q --qf '%{VERSION}\n' gnome-ptyxis 2>/dev/null || true)"
+fi
+PTYXIS_VERSION_NUM="$(printf '%s' "${PTYXIS_VERSION_RAW}" | grep -Eo '[0-9]+(\.[0-9]+)?' | head -n1 || true)"
+PTYXIS_MAJOR="${PTYXIS_VERSION_NUM%%.*}"
+if [ -z "${PTYXIS_MAJOR}" ]; then
+    PTYXIS_MAJOR="0"
+fi
 
+echo "Ptyxis detectado: ${PTYXIS_VERSION_RAW:-versión desconocida}"
+if [ "${PTYXIS_MAJOR}" -ge 50 ]; then
+    pass "Versión compatible con flujo 5.0+"
+else
+    warn "Versión menor a 5.0 detectada, usando chequeos retrocompatibles"
+fi
+
+if gsettings list-schemas | grep -Fxq 'org.gnome.Ptyxis'; then
+    pass "Esquema org.gnome.Ptyxis detectado"
+else
+    fail "No se encontró el esquema org.gnome.Ptyxis"
+fi
+
+DEFAULT_PROFILE_UUID="$(dconf read /org/gnome/Ptyxis/default-profile-uuid 2>/dev/null | tr -d "'")"
+if [ -z "${DEFAULT_PROFILE_UUID}" ]; then
+    fail "No hay default-profile-uuid en /org/gnome/Ptyxis"
+    echo ""
+    echo "Diagnóstico: ejecuta primero ./install-ptyxis50.sh"
+    exit 1
+fi
+
+pass "UUID por defecto detectado: ${DEFAULT_PROFILE_UUID}"
+PROFILE_PATH="/org/gnome/Ptyxis/Profiles/${DEFAULT_PROFILE_UUID}/"
+
+read_key() {
+    local key="$1"
+    local label="$2"
+    local value
+    value="$(dconf read "${PROFILE_PATH}${key}" 2>/dev/null || true)"
+    if [ -z "${value}" ]; then
+        fail "${label}: no configurado (${PROFILE_PATH}${key})"
+    else
+        pass "${label}: ${value}"
+    fi
+}
+
+echo ""
 echo "Leyendo configuración actual:"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo ""
+read_key "background-color" "Background"
+read_key "foreground-color" "Foreground"
+read_key "cursor-background-color" "Cursor background"
+read_key "cursor-foreground-color" "Cursor foreground"
+read_key "palette" "Paleta"
+read_key "bold-color-same-as-fg" "Bold color same as fg"
+read_key "bold-is-bright" "Bold is bright"
 
-echo "Background:"
-dconf read "${PROFILE_PATH}/background-color" || echo "  (no configurado)"
 echo ""
+echo "Claves disponibles en el perfil:"
+if dconf list "${PROFILE_PATH}" >/dev/null 2>&1; then
+    dconf list "${PROFILE_PATH}" | sed 's/^/  - /'
+    pass "Lectura de claves del perfil OK"
+else
+    fail "No se pudo listar el perfil (${PROFILE_PATH})"
+fi
 
-echo "Foreground:"
-dconf read "${PROFILE_PATH}/foreground-color" || echo "  (no configurado)"
 echo ""
-
-echo "Cursor background:"
-dconf read "${PROFILE_PATH}/cursor-background-color" || echo "  (no configurado)"
-echo ""
-
-echo "Cursor foreground:"
-dconf read "${PROFILE_PATH}/cursor-foreground-color" || echo "  (no configurado)"
-echo ""
-
-echo "Paleta:"
-dconf read "${PROFILE_PATH}/palette" || echo "  (no configurado)"
-echo ""
-
-echo "Bold color same as fg:"
-dconf read "${PROFILE_PATH}/bold-color-same-as-fg" || echo "  (no configurado)"
-echo ""
-
-echo "Bold is bright:"
-dconf read "${PROFILE_PATH}/bold-is-bright" || echo "  (no configurado)"
-echo ""
-
-# Mostrar todas las claves disponibles
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "Todas las claves disponibles en el perfil:"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-dconf list "${PROFILE_PATH}/" || echo "No se pudo listar"
+echo "Resumen: ${PASS_COUNT} OK, ${FAIL_COUNT} con problema"
+
+if [ "${FAIL_COUNT}" -gt 0 ]; then
+    exit 1
+fi
+
+exit 0
