@@ -4,7 +4,7 @@
 # Basado en estética Cyberpunk - h4tt3r-xplo1t
 # Tema inspirado en diseño de seguridad digital futurista
 
-set -e
+set -euo pipefail
 
 echo "🚀 ==========================================";
 echo "   Instalador - Tema Morado Futurista";
@@ -158,18 +158,18 @@ echo "3. Selecciona 'Apariencia' o 'Temas'"
 echo "4. Busca y selecciona 'Purple Cyberpunk'"
 echo "5. Reinicia Ptyxis"
 echo "";
-echo "Opción 2: Aplicar via DConf (línea de comandos)"
+echo "Opción 2: Aplicar configuración activa (recomendado para Ptyxis 5.0+)"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
-echo "$ dconf load /org/gnome/Ptyxis/Profiles/purple-cyberpunk < ${PTYXIS_CONFIG_DIR}/dconf-purple-settings"
+echo "$ bash ./install-ptyxis50.sh"
 echo "";
-echo "Opción 3: Editar manualmente en gsettings"
+echo "Opción 3: Verificar estado actual"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
-echo "$ gsettings set org.gnome.Ptyxis color-scheme 'purple-cyberpunk'"
+echo "$ bash ./verify-ptyxis50.sh"
 echo "";
 echo "🔧 Si el tema no aparece:"
 echo "   • Reinicia Ptyxis completamente: killall ptyxis && ptyxis"
 echo "   • Verifica la instalación: ls -la ${THEME_DIR}/"
-echo "   • Recarga DConf: dconf write /org/gnome/dconf-service/user-db/locks '[]'"
+echo "   • Verifica diagnóstico: bash ./verify-ptyxis50.sh"
 echo "";
 echo "📊 Información del tema:"
 echo "   • Fondo: #0a0014 (Morado muy oscuro)"
