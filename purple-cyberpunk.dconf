@@ -1,0 +1,10 @@
+[/org/gnome/Ptyxis/Profiles/purple-cyberpunk]
+background-color='rgb(10, 0, 20)'
+foreground-color='rgb(224, 176, 255)'
+palette=['rgb(26, 0, 51)', 'rgb(255, 20, 147)', 'rgb(0, 255, 136)', 'rgb(255, 170, 0)', 'rgb(119, 0, 255)', 'rgb(255, 0, 255)', 'rgb(0, 255, 255)', 'rgb(224, 176, 255)', 'rgb(77, 0, 153)', 'rgb(255, 20, 147)', 'rgb(0, 255, 136)', 'rgb(255, 170, 0)', 'rgb(153, 51, 255)', 'rgb(255, 0, 255)', 'rgb(0, 255, 255)', 'rgb(255, 255, 255)']
+bold-color-same-as-fg=true
+bold-is-bright=true
+cursor-background-color='rgb(255, 0, 255)'
+cursor-foreground-color='rgb(10, 0, 20)'
+highlight-background-color='rgb(77, 0, 153)'
+highlight-foreground-color='rgb(224, 176, 255)'
