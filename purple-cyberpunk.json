@@ -1,0 +1,62 @@
+{
+  "name": "Purple Cyberpunk",
+  "version": "1.0",
+  "description": "Tema morado futurista estilo cyberpunk para terminal Ptyxis",
+  "author": "h4tt3r-xplo1t",
+  "license": "MIT",
+  "compatibility": {
+    "ptyxis": "45.0+",
+    "gnome": "45+",
+    "linux": "All distributions"
+  },
+  "metadata": {
+    "created": "2026-09-03",
+    "updated": "2026-09-03",
+    "category": "Dark Themes",
+    "tags": ["cyberpunk", "morado", "futurista", "dark", "terminal"]
+  },
+  "colors": {
+    "background": "#0a0014",
+    "foreground": "#e0b0ff",
+    "cursor": "#ff00ff",
+    "selection": "#4d0099",
+    "palette": {
+      "black": "#1a0033",
+      "red": "#ff1493",
+      "green": "#00ff88",
+      "yellow": "#ffaa00",
+      "blue": "#7700ff",
+      "magenta": "#ff00ff",
+      "cyan": "#00ffff",
+      "white": "#e0b0ff",
+      "bright_black": "#4d0099",
+      "bright_red": "#ff1493",
+      "bright_green": "#00ff88",
+      "bright_yellow": "#ffaa00",
+      "bright_blue": "#9933ff",
+      "bright_magenta": "#ff00ff",
+      "bright_cyan": "#00ffff",
+      "bright_white": "#ffffff"
+    }
+  },
+  "settings": {
+    "bold_color_same_as_fg": true,
+    "bold_is_bright": true,
+    "use_theme_colors": false,
+    "opacity": 0.95,
+    "cursor_blink": true,
+    "audible_bell": false
+  },
+  "recommended_fonts": [
+    "Fira Code 12",
+    "JetBrains Mono 12",
+    "Monospace 12",
+    "Liberation Mono 12",
+    "Ubuntu Mono 12"
+  ],
+  "installation": {
+    "method1": "Script automático - ./install-purple-theme.sh",
+    "method2": "Manual - Copiar archivos a ~/.config/ptyxis/schemes/",
+    "method3": "DConf - dconf load < purple-cyberpunk.dconf"
+  }
+}
